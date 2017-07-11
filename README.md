@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/bot437/test.svg?branch=master)](https://travis-ci.org/bot437/test)
 # Тест
 
 Приложение на Spring Boot
