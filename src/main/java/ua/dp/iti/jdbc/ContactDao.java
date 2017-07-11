@@ -35,9 +35,9 @@ public class ContactDao {
         int count = 0;
         List<Contact> contacts = new LinkedList<>();
         SqlRowSet rows = jdbcTemplate.queryForRowSet("SELECT id,name FROM contacts");
-        while (rows.next() && skip > 0) {
+        while ( skip > 0 && rows.next()) {
             if (rows.getString(2).matches(regex))
-                if (skip > 0) skip--;
+                skip--;
         }
         while (rows.next()) {
             contacts.add(new Contact(rows.getLong(1), rows.getString(2)));
