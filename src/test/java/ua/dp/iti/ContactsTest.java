@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import ua.dp.iti.jdbc.ContactDao;
 
 /**
  * Created by bot on 10.07.17.
@@ -21,9 +22,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 public class ContactsTest {
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private ContactDao dao;
 
     @Test
     public void getHello() throws Exception {
+        dao.createRandom();
         String filter = "^.*$";
         mvc.perform(MockMvcRequestBuilders.get("/hello/contacts").param("nameFilter", filter).accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
