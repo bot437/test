@@ -8,10 +8,8 @@ import ua.dp.iti.data.Contact;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
-/**
- * Created by bot on 10.07.17.
- */
 @Repository
 public class ContactDao {
     @Autowired
@@ -21,28 +19,31 @@ public class ContactDao {
         jdbcTemplate.update("INSERT INTO contacts (name) VALUES (?)", Contact.randomString());
     }
 
-    public List<Contact> list(String regex) {
+    public List<Contact> list(Pattern pattern) {
         List<Contact> contacts = new LinkedList<>();
+        jdbcTemplate.setFetchSize(100);
         jdbcTemplate.query("SELECT id,name FROM contacts", resultSet -> {
-            if (resultSet.getString(2).matches(regex)) {
+            if (!pattern.matcher(resultSet.getString(2)).matches()) {
                 contacts.add(new Contact(resultSet.getLong(1), resultSet.getString(2)));
             }
         });
         return contacts;
     }
 
-    public List<Contact> list(String regex, int skip, int max) {
+    public List<Contact> list(Pattern pattern, int skip, int max) {
         int count = 0;
         List<Contact> contacts = new LinkedList<>();
+        jdbcTemplate.setFetchSize(100);
         SqlRowSet rows = jdbcTemplate.queryForRowSet("SELECT id,name FROM contacts");
         while ( skip > 0 && rows.next()) {
-            if (rows.getString(2).matches(regex))
+            if (!pattern.matcher(rows.getString(2)).matches())
                 skip--;
         }
         while (rows.next()) {
-            contacts.add(new Contact(rows.getLong(1), rows.getString(2)));
+            if(!pattern.matcher(rows.getString(2)).matches())
+                contacts.add(new Contact(rows.getLong(1), rows.getString(2)));
             count++;
-            if (count == max) return contacts;
+            if (count == max) break;
         }
         return contacts;
     }

@@ -28,8 +28,10 @@ public class ContactsTest {
     @Test
     public void getHello() throws Exception {
         dao.createRandom();
-        String filter = "^.*$";
-        mvc.perform(MockMvcRequestBuilders.get("/hello/contacts").param("nameFilter", filter).accept(MediaType.APPLICATION_JSON))
+        String filter = "^[ab]*$";
+        mvc.perform(MockMvcRequestBuilders.get("/hello/contacts")
+                .param("nameFilter", filter)
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("name")));
     }
@@ -42,8 +44,17 @@ public class ContactsTest {
     }
 
     @Test
+    public void getPatternError() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/hello/contacts")
+                .param("nameFilter", "]**^^^&")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is(409));
+    }
+
+    @Test
     public void getHelloWithPagination() throws Exception {
-        String filter = "^.*$";
+        dao.createRandom();
+        String filter = "^[ab]*$";
         mvc.perform(MockMvcRequestBuilders.get("/hello/contacts")
                 .param("nameFilter", filter)
                 .param("max", "5")

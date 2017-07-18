@@ -3,9 +3,6 @@ package ua.dp.iti.data;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-/**
- * Created by bot on 10.07.17.
- */
 public class Contact {
     Long id;
     String name;

@@ -14,10 +14,8 @@ import ua.dp.iti.data.ErrorMessage;
 import ua.dp.iti.jdbc.ContactDao;
 
 import java.util.List;
-
-/**
- * Created by bot on 10.07.17.
- */
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 @RestController
 @RequestMapping("/hello")
@@ -32,10 +30,11 @@ public class ContactController {
             @RequestParam(value = "skip", defaultValue = "0") Integer skip,
             @RequestParam(value = "max", required = false) Integer max
     ) {
+        Pattern pattern = Pattern.compile(regex);
         if(max!=null) {
-            return dao.list(regex,skip,max);
+            return dao.list(pattern,skip,max);
         }
-        return dao.list(regex);
+        return dao.list(pattern);
     }
 
     public static class Message {
@@ -60,6 +59,11 @@ public class ContactController {
         } catch (Exception e) {
             return new Message("Error: "+e.getMessage());
         }
+    }
+
+    @ExceptionHandler(PatternSyntaxException.class)
+    public ResponseEntity<ErrorMessage> badPattern(PatternSyntaxException ex) {
+        return new ResponseEntity<>(new ErrorMessage(ex.getMessage()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
